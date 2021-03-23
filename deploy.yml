@@ -1,0 +1,63 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kuber_lesson_2 
+  labels:
+    app: k8s-app
+    stage: prod
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      project: levelup
+  template:
+    metadata:
+      labels:
+        project: levelup
+    spec:
+      containers:
+        - name: levelup
+          image: likemaydev/kuber-lesson-2:latest
+          ports:
+            - containerPort: 80
+---
+apiVersion: autoscaling/v2beta2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: myscale
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: kuber-lesson-2-autoscaling
+  minReplicas: 3
+  maxReplicas: 6
+
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
+  - type: Resource
+    resource:
+      name: memory
+      target:
+        type: AverageValue
+        averageValue: 100Mi
+---
+apiVersion: apps/v1
+kind: Service
+metadata:
+  name: k8s-svc
+  labels:
+    app: k8s-app
+spec:
+  type: LoadBalancer
+  selector:
+    app: k8s-app
+  ports:
+    - protocol: TCP
+      port: 80
+      targetPort: 80
