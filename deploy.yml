@@ -1,19 +1,19 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kuber_lesson_2 
+  name: kuber-lesson-2-deploy
   labels:
-    app: k8s-app
-    stage: prod
+    app: kuber-lesson-2
+    stage: test
 spec:
-  replicas: 3
+  replicas: 2
   selector:
     matchLabels:
-      project: levelup
+      app: kuber-lesson-2
   template:
     metadata:
       labels:
-        project: levelup
+        app: kuber-lesson-2
     spec:
       containers:
         - name: levelup
@@ -24,14 +24,14 @@ spec:
 apiVersion: autoscaling/v2beta2
 kind: HorizontalPodAutoscaler
 metadata:
-  name: myscale
+  name: kl2-autoscale
 spec:
   scaleTargetRef:
     apiVersion: apps/v1
     kind: Deployment
-    name: kuber-lesson-2-autoscaling
+    name: kuber-lesson-2
   minReplicas: 3
-  maxReplicas: 6
+  maxReplicas: 4
 
   metrics:
   - type: Resource
@@ -47,16 +47,16 @@ spec:
         type: AverageValue
         averageValue: 100Mi
 ---
-apiVersion: apps/v1
+apiVersion: v1
 kind: Service
 metadata:
-  name: k8s-svc
+  name: kuber-lesson-2-svc
   labels:
-    app: k8s-app
+    app: kuber-lesson-2
 spec:
   type: LoadBalancer
   selector:
-    app: k8s-app
+    app: kuber-lesson-2
   ports:
     - protocol: TCP
       port: 80
